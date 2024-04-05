@@ -1,0 +1,1 @@
+python train_ecg.py --device=cuda:0 --batch=4 --patience=5 --model=big --mask=0.75 --use_ce

@@ -1,0 +1,1 @@
+python viz_tokens.py --data=./data/test_data_by_placement_na_True_True_True_False_True.npy --mask=0.75 --vocab_size=250
