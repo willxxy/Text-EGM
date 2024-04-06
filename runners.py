@@ -96,9 +96,6 @@ def validate(model, val_dataloader, device, args, ce = None):
                     
             total_loss += loss.item()
             len_of_batch +=1
-            # count +=1
-            # if count == 20:
-            #     break
 
     avg_loss = total_loss / len_of_batch
     
@@ -128,17 +125,7 @@ def decode_from_tokens(tokenizer, tokens, signal_size, min_vals, max_vals, args)
     for i in range(tokens.shape[0]):
         output_tokens = tokenizer.convert_ids_to_tokens(tokens[i])
         
-        # 3 to 1 
-        if args.ratio == 3:
-            quantized_signal = torch.tensor([extract_value(token) for token in output_tokens[1:4001]]).to(args.device)
-        # 2 to 1 
-        elif args.ratio == 2:
-            quantized_signal = torch.tensor([extract_value(token) for token in output_tokens[1:3001]]).to(args.device)
-        # 1 to 1 
-        elif args.ratio == 1:
-            quantized_signal = torch.tensor([extract_value(token) for token in output_tokens[1:2001]]).to(args.device)
-        else:
-            quantized_signal = torch.tensor([extract_value(token) for token in output_tokens[1:1001]]).to(args.device)
+        quantized_signal = torch.tensor([extract_value(token) for token in output_tokens[1:1001]]).to(args.device)
             
     
         quantized_afib = torch.tensor([extract_value(token) for token in [output_tokens[-2]]]).to(args.device)
@@ -250,55 +237,18 @@ def inference(model, tokenizer, test_dataloader, device, args):
                 for i in range(batch_data.shape[0]):
                     masked_positions_i = (batch_mask[i] == 0)
                     new_mask = batch_mask[i]
-                    # 3 to 1 
-                    if args.ratio == 3:
-                        masked_positions_i  = torch.cat([masked_positions_i[1:4001], masked_positions_i[-2].unsqueeze(0)], dim=0)
-                        preds_masked_i = decoded.cpu().numpy()[i][masked_positions_i.cpu().numpy()]
-                        new_mask  = torch.cat([batch_mask[i][1:4001], batch_mask[i][-2].unsqueeze(0)], dim=0)
-                    # 2 to 1 
-                    elif args.ratio == 2:
-                        masked_positions_i  = torch.cat([masked_positions_i[1:3001], masked_positions_i[-2].unsqueeze(0)], dim=0)
-                        preds_masked_i = decoded.cpu().numpy()[i][masked_positions_i.cpu().numpy()]
-                        new_mask  = torch.cat([batch_mask[i][1:3001], batch_mask[i][-2].unsqueeze(0)], dim=0)
-                    # 1 to 1 
-                    elif args.ratio == 1:
-                        masked_positions_i  = torch.cat([masked_positions_i[1:2001],masked_positions_i[-2].unsqueeze(0)], dim=0)
-                        preds_masked_i = decoded.cpu().numpy()[i][masked_positions_i.cpu().numpy()]
-                        new_mask  = torch.cat([batch_mask[i][1:2001] ,batch_mask[i][-2].unsqueeze(0)], dim=0)
-                    else:
-                        masked_positions_i  = torch.cat([masked_positions_i[1:1001],masked_positions_i[-2].unsqueeze(0)], dim=0)
-                        preds_masked_i = decoded.cpu().numpy()[i][masked_positions_i.cpu().numpy()]
-                        new_mask  = torch.cat([batch_mask[i][1:1001], batch_mask[i][-2].unsqueeze(0)], dim=0)
+                    masked_positions_i  = torch.cat([masked_positions_i[1:1001],masked_positions_i[-2].unsqueeze(0)], dim=0)
+                    preds_masked_i = decoded.cpu().numpy()[i][masked_positions_i.cpu().numpy()]
+                    new_mask  = torch.cat([batch_mask[i][1:1001], batch_mask[i][-2].unsqueeze(0)], dim=0)
                         
                     stitched_seq, masked_position = stitch_sequences(batch_raw[i].cpu().numpy(), new_mask.cpu().numpy(), preds_masked_i)
                     masked_positions_list.append(masked_position)
                     ground_truth_seq = batch_raw[i].cpu().numpy()
                     
-                    # 3 to 1
-                    if args.ratio == 3:
-                        stitched_sequences.append(stitched_seq[:4000])
-                        ground_truth_sequences.append(ground_truth_seq[:4000])
-                        afib_stitched = stitched_seq[-1]
-                        afib_gt = ground_truth_seq[-1]
-                    
-                    # 2 to 1
-                    elif args.ratio == 2:
-                        stitched_sequences.append(stitched_seq[:3000])
-                        ground_truth_sequences.append(ground_truth_seq[:3000])
-                        afib_stitched = stitched_seq[-1]
-                        afib_gt = ground_truth_seq[-1]
-                    
-                    # 1 to 1
-                    elif args.ratio == 1:
-                        stitched_sequences.append(stitched_seq[:2000])
-                        ground_truth_sequences.append(ground_truth_seq[:2000])
-                        afib_stitched = stitched_seq[-1]
-                        afib_gt = ground_truth_seq[-1]
-                    else:
-                        stitched_sequences.append(stitched_seq[:1000])
-                        ground_truth_sequences.append(ground_truth_seq[:1000])
-                        afib_stitched = stitched_seq[-1]
-                        afib_gt = ground_truth_seq[-1]
+                    stitched_sequences.append(stitched_seq[:1000])
+                    ground_truth_sequences.append(ground_truth_seq[:1000])
+                    afib_stitched = stitched_seq[-1]
+                    afib_gt = ground_truth_seq[-1]
                     
                     ground_truth_afib.append(afib_gt)
                     pred_afib.append(afib_stitched)
@@ -328,9 +278,6 @@ def inference(model, tokenizer, test_dataloader, device, args):
                     mean_accuracies_afib.append(mean_acc_afib)
 
             count_index +=1
-            # count +=1
-            # if count == 10:
-            #     break
             
     if args.model == 'vit' or args.model == 'big_ts' or args.model == 'long_ts':
         print("Average Accuracy for Afib:", np.mean(mean_accuracies_afib))
@@ -387,6 +334,3 @@ def inference(model, tokenizer, test_dataloader, device, args):
             'index': count_index_list
         }
     np.save(f'./runs/checkpoint/{args.checkpoint}/best_np.npy', np_save)
-
-
-
