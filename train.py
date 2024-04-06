@@ -35,11 +35,8 @@ def get_args():
     parser.add_argument('--TS', action='store_true', help = 'Please choose whether to do Token Substitution')
     parser.add_argument('--TA', action='store_true', help = 'Please choose whether to do Token Addition')
     parser.add_argument('--LF', action='store_true', help = 'Please choose whether to do label flipping')
-    parser.add_argument('--pad_to_full', action='store_true', help = 'Please choose whether to augment the sequence or not')
-    parser.add_argument('--random', action = 'store_true', help = 'Please choose whether to randomly mask out the future signals')
     parser.add_argument('--toy', action = 'store_true', help = 'Please choose whether to use a toy dataset or not')
     parser.add_argument('--inference', action='store_true', help = 'Please choose whether it is inference or not')
-    parser.add_argument('--norm_loss', action='store_true', help = 'Please choose whether to normalize the loss or not')
     return parser.parse_args()
     
     
@@ -70,7 +67,6 @@ def main():
     print(device)
     print('Loading Data...')
     print(f'CE being used: {args.use_ce}')
-    print(f'What is the ratio of forecasting being used? {args.ratio}:1')
     
     train = np.load('./data/train_intra.npy', allow_pickle = True).item()
     val = np.load('./data/val_intra.npy', allow_pickle = True).item()
