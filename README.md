@@ -32,7 +32,7 @@ Note: Please ensure that the pip you are using is from the conda environment
 
 1. Although the data we curated is not publicly available, we do have experimental results on an external dataset, namely the "Intracardiac Atrial Fibrillation Database" available on PhysioNet.
 
-2. To set up this data, first set up a `data` folder and `cd` into it.
+2. To set up this data, `cd` into the `preprocess` folder.
 
 3. Please execute the following command to download the data.
 
