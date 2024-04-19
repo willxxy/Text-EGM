@@ -158,10 +158,7 @@ if __name__ == '__main__':
         
     test_loader = DataLoader(test_dataset, batch_size=args.batch, shuffle=False)   
     
-    
     checkpoint = torch.load(f'./runs/checkpoint/{args.checkpoint}/best_checkpoint.chkpt', map_location = args.device)
-    
     model.load_state_dict(checkpoint['model'])
-    model = model.to(device)
     print(f'Inferencing checkpoint {args.checkpoint}... ')
     inference(model, tokenizer, test_loader, device, args)
