@@ -71,8 +71,8 @@ def ensure_directory_exists(directory_path):
     else:
         print(f"Directory already exists: {directory_path}")
 
-def main():
-    egm_signals = read_all()
+def main(args):
+    egm_signals = read_all(args)
     normalized_egm = z_score_normalization(egm_signals)
     segmented_data = segment_signal(normalized_egm, 1000)
 
@@ -103,4 +103,5 @@ def main():
     np.save('../data/test_intra.npy', test)
 
 if __name__ == '__main__':
-    main()
+    args = get_args()
+    main(args)
